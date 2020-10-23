@@ -50,6 +50,18 @@ class UserControler {
         res.status(200)
         res.send('Tudo ok')
     }
+
+    async update(req, res){
+        const { id, name, role, email } = req.body
+        const result = await UserModel.update(id, email, name, role)
+
+        if(result != undefined){
+            if(result.status){
+                
+            }
+        }
+    }
+
 }
 
 module.exports = new UserControler()
