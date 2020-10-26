@@ -8,7 +8,7 @@ class UserControler {
 
     async findUser(req, res) {
         let id = req.params.id
-        let user = await UserModel.findId(id)
+        let user = await UserModel.findById(id)
         if (user == undefined) {
             res.status(404)
             res.json({ err: "Erro ao pesquisar Usuario" })
@@ -53,12 +53,19 @@ class UserControler {
 
     async update(req, res){
         const { id, name, role, email } = req.body
-        const result = await UserModel.update(id, email, name, role)
+        const result = await UserModel.update(id, name, email, role)
 
         if(result != undefined){
             if(result.status){
-                
+                res.status(200)
+                res.send("Tudo OK!")
+            }else{
+                res.status(406)
+                res.send(result.err)
             }
+        }else{
+            res.status(406)
+            res.send("ocorreu um erro no servidor")
         }
     }
 

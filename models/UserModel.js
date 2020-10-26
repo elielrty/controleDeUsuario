@@ -56,12 +56,17 @@ class User {
         const user = this.findById(id) // pegando o usuario que vai receber a edição
 
         if (user != undefined) {
-            let editUser = {}
+            const editUser = {}
 
+
+
+            if (name != undefined) {// validação
+                editUser.name_users = name
+            }
             if (email != undefined) {
                 if (email != user.email_users) {
                     const result = await this.findEmail(email) //verificando se ja existe o email cadastrado
-                    if (result) {
+                    if (result == false) {
                         editUser.email_users = email
                     } else {
                         return { status: false, err: "E-mail ja estar cadastrado" }
@@ -69,11 +74,6 @@ class User {
 
                 }
             }
-
-            if (name != undefined) {// validação
-                editUser.name_users = name
-            }
-
             if (role != undefined) {// validação
                 editUser.role_users = role
             }
@@ -87,6 +87,22 @@ class User {
 
         } else {
             return { status: false, err: "O usuario não existe" }
+        }
+    }
+
+    async delete(id){
+        const user = await this.findById(id)
+
+        if(user != undefined){
+            try{
+                await knex.delete().where({id_users: id}).table("users")
+                return {status: true}
+            }catch(err){
+                return { status: false, err: err  }
+            }
+
+        }else{
+            return {status: false, err: "Usuario não exite!"}
         }
     }
 }
