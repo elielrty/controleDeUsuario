@@ -26,6 +26,20 @@ class User {
         }
     }
 
+    async findByEmail(email) { //listado usuarios cadastrados pelo id
+        try {
+            const result = await knex.select(["id_users", "name_users", "email_users", "role_users"]).where({ email_users: email }).table("users") //selecionado os campos que consulta retornar
+            if (result.length > 0) {
+                return result[0]
+            } else {
+                return undefined
+            }
+        } catch (err) {
+            console.log(err)
+            return undefined
+        }
+    }
+
 
     async NewUser(name_users, email_users, password_users,) { // cadastrando usuario
         try {
@@ -39,7 +53,7 @@ class User {
     }
     async findEmail(email) { // verificando se o email exite no banco
         try {
-            const result = await knex.select("*").from("users").where({ email_users: email })
+            const result = await knex.select("*").from("users").where({ email_users: email }) 
 
             if (result.length > 0) {
                 return true
@@ -55,15 +69,15 @@ class User {
     async update(id, name, email, role) {// editando cadastro
         const user = this.findById(id) // pegando o usuario que vai receber a edição
 
-        if (user != undefined) {
+        if (user) {
             const editUser = {}
 
 
 
-            if (name != undefined) {// validação
+            if (name) {// validação
                 editUser.name_users = name
             }
-            if (email != undefined) {
+            if (email) {
                 if (email != user.email_users) {
                     const result = await this.findEmail(email) //verificando se ja existe o email cadastrado
                     if (result == false) {
@@ -74,7 +88,7 @@ class User {
 
                 }
             }
-            if (role != undefined) {// validação
+            if (role) {// validação
                 editUser.role_users = role
             }
 
@@ -93,7 +107,7 @@ class User {
     async delete(id){
         const user = await this.findById(id)
 
-        if(user != undefined){
+        if(user){
             try{
                 await knex.delete().where({id_users: id}).table("users")
                 return {status: true}

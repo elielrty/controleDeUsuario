@@ -1,4 +1,5 @@
-let UserModel = require("../models/UserModel")
+const UserModel = require("../models/UserModel")
+const TokenPass = require("../models/PasswordTokenModel")
 class UserControler {
     async list(req, res) {
         const users = await UserModel.findAll()
@@ -21,17 +22,17 @@ class UserControler {
     async create(req, res) {
         let { email, name, password } = req.body
 
-        if (email == undefined) {
+        if (!email) {
             res.status(401)
             res.json({ erro: "O email é invalido" })
             return
         } else {
-            if (name == undefined) {
+            if (!name) {
                 res.status(401)
                 res.json({ erro: "O nome é invalido" })
                 return
             } else {
-                if (password == undefined) {
+                if (!password) {
                     res.status(401)
                     res.json({ erro: "A senha é invalida" })
                     return
@@ -67,6 +68,26 @@ class UserControler {
             res.status(406)
             res.send("ocorreu um erro no servidor")
         }
+    }
+
+    async delete(req, res){
+        const id = req.params.id
+
+        const result = await UserModel.delete(id)
+
+        if(result.status){
+            res.status(200)
+            res.send("Tudo ok")
+        }else{
+            res.status(406)
+            res.send(result.err)
+        }
+    }
+
+    async recoverPass(req, res){
+        const email = req.body.email
+
+        const result = await TokenPass.create(email)
     }
 
 }
