@@ -10,6 +10,7 @@ router.get('/user', UserController.list)
 router.get('/user/:id', UserController.findUser)
 router.put('/user', UserController.update)
 router.delete('/user/:id', UserController.delete)
+router.post('/recoverpass', UserController.recoverPass)
 
 
 module.exports = router;

@@ -1,13 +1,13 @@
 const UserModel = require("../models/UserModel")
 const TokenPass = require("../models/PasswordTokenModel")
 class UserControler {
-    async list(req, res) {
+    async list(req, res) { // listando todos os usuarios
         const users = await UserModel.findAll()
         res.status(200)
         res.json(users)
     }
 
-    async findUser(req, res) {
+    async findUser(req, res) { // pesquisando um usuario
         let id = req.params.id
         let user = await UserModel.findById(id)
         if (user == undefined) {
@@ -19,7 +19,7 @@ class UserControler {
         }
     }
 
-    async create(req, res) {
+    async create(req, res) { //cadastrando um usuario
         let { email, name, password } = req.body
 
         if (!email) {
@@ -39,7 +39,7 @@ class UserControler {
                 }
             }
         }
-        const emailExist = await UserModel.findEmail(email)
+        const emailExist = await UserModel.findEmail(email) // verificando se o email existe
         if (emailExist) {
             res.status(406)
             res.json({ err: "E-mail ja cadastrado" })
@@ -52,7 +52,7 @@ class UserControler {
         res.send('Tudo ok')
     }
 
-    async update(req, res){
+    async update(req, res){ // editando usuario
         const { id, name, role, email } = req.body
         const result = await UserModel.update(id, name, email, role)
 
@@ -70,7 +70,7 @@ class UserControler {
         }
     }
 
-    async delete(req, res){
+    async delete(req, res){ // deletando usuario
         const id = req.params.id
 
         const result = await UserModel.delete(id)
@@ -84,10 +84,30 @@ class UserControler {
         }
     }
 
-    async recoverPass(req, res){
+    async recoverPass(req, res){ // rescuperando senha
         const email = req.body.email
-
         const result = await TokenPass.create(email)
+        if(result.status){
+            res.status(200)
+            res.send("" + result.token)
+        }else{
+            res.status(406)
+            res.send(result.err)
+        }
+    }
+
+    async changePass(req, res){
+        const token = req.body.token
+        const password = req.body.password
+
+        const isTokenValid = await TokenPass.validate(token)
+
+        if(isTokenValid){
+
+        }else{
+            res.status(406)
+            res.send("token valido")
+        }
     }
 
 }

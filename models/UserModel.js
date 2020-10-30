@@ -119,6 +119,10 @@ class User {
             return {status: false, err: "Usuario não exite!"}
         }
     }
+
+    async changepass(newPassoword, id, token){
+        
+    }
 }
 
 module.exports = new User()
