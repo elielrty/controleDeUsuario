@@ -1,7 +1,7 @@
 const knex = require("../database/connection")
 const User = require("./UserModel")
 
-class PasswordToken {
+class PasswordToken { // gerando token e salvando no banco de dados
     async create(email) {
         const user = await User.findByEmail(email)
         if (user) {
@@ -23,24 +23,32 @@ class PasswordToken {
         }
     }
 
-    async validate(token){
+    async validate(token){ //validado token
         try{
            const result = await knex.select().where({ token: token }).table("user_token")
 
            if( result.length > 0){
                 const tk = result[0]
                 if(tk.used == 1){
-                    false
+                   return {status: false}
                 }else{
-                    return true
+                    return {status: true, token: tk}
                 }
 
            }else{
-               return false
+               return {status: false}
            }
         }catch(err){
             console.log(err)
-            return false
+            return {status: false}
+        }
+    }
+
+    async setToken(token){ // setando o token como usado
+        try{
+            await knex.update({used: 1}).where({token: token}).table("user_token")
+        }catch(err){
+            console.log(err)
         }
     }
 

@@ -1,5 +1,6 @@
 let knex = require("../database/connection")
 let bcrypt = require("bcrypt")
+const PasswordTokenModel = require("./PasswordTokenModel")
 
 class User {
     async findAll() { //listado usuarios cadastrados
@@ -28,15 +29,15 @@ class User {
 
     async findByEmail(email) { //listado usuarios cadastrados pelo id
         try {
-            const result = await knex.select(["id_users", "name_users", "email_users", "role_users"]).where({ email_users: email }).table("users") //selecionado os campos que consulta retornar
+            const result = await knex.select(["id_users", "name_users", "password_users", "email_users", "role_users"]).where({ email_users: email }).table("users") //selecionado os campos que consulta retornar
             if (result.length > 0) {
                 return result[0]
             } else {
-                return undefined
+                return false
             }
         } catch (err) {
             console.log(err)
-            return undefined
+            return false
         }
     }
 
@@ -120,8 +121,16 @@ class User {
         }
     }
 
-    async changepass(newPassoword, id, token){
-        
+    async changePass(newPassoword, id, token){ // Mudando a senha
+        try{
+            const hash = await bcrypt.hash(newPassoword, 10)
+            await knex.update({password_users: hash}).where({id_users: id}).table("users") //mudando a senha
+            await PasswordTokenModel.setToken(token) // colocando o token como usando 
+            return {status: true}
+        }catch(err){
+            console.log(err)
+            return {status: false}
+        }
     }
 }
 
