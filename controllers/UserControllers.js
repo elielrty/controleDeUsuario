@@ -40,7 +40,7 @@ class UserControler {
             } else {
                 if (!password) {
                     res.status(401)
-                    res.json({ erro: "A senha é invalida" })
+                    res.json({ err: "A senha é invalida" })
                     return
                 }
             }
@@ -55,7 +55,7 @@ class UserControler {
         await UserModel.NewUser(name, email, password)
 
         res.status(200)
-        res.send('Tudo ok')
+        res.json({err: "Tudo OK!"})
     }
 
     async update(req, res){ // editando usuario
@@ -65,14 +65,14 @@ class UserControler {
         if(result != undefined){
             if(result.status){
                 res.status(200)
-                res.send("Tudo OK!")
+                res.json({sucess: "Tudo OK!"})
             }else{
                 res.status(406)
-                res.send(result.err)
+                res.json({err: result.err})
             }
         }else{
             res.status(406)
-            res.send("ocorreu um erro no servidor")
+            res.json({err: "ocorreu um erro no servidor"})
         }
     }
 
@@ -83,10 +83,10 @@ class UserControler {
 
         if(result.status){
             res.status(200)
-            res.send("Tudo ok")
+            res.json({sucess:"Tudo ok"})
         }else{
             res.status(406)
-            res.send(result.err)
+            res.json({err: result.err})
         }
     }
 
@@ -95,10 +95,10 @@ class UserControler {
         const result = await TokenPass.create(email)
         if(result.status){
             res.status(200)
-            res.send("" + result.token)
+            res.json({sucess:result.token})
         }else{
             res.status(406)
-            res.send(result.err)
+            res.json({err: result.err})
         }
     }
 
@@ -112,16 +112,16 @@ class UserControler {
           const result = await UserModel.changePass(password, isTokenValid.token.id_user, isTokenValid.token.token)
           if(result.status){
             res.status(200)
-            res.send("Senha alterada")
+            res.json({sucess: "Senha alterada"})
             return
             }else{
                 res.status(406)
-                res.send("erro ao salvar senha")
+                res.json({err: "erro ao salvar senha"})
                 return
             }
         }else{
             res.status(406)
-            res.send("token invalido")
+            res.json({err: "token invalido"})
             return
         }
     }
@@ -134,13 +134,23 @@ class UserControler {
         if(user){
             const result = await bcrypt.compare(password, user.password_users)// Comparando a senha passando com a do banco
             if(result){
-
+                    jwt.sign({email: user.email_users, role: user.role_users}, secret, {expiresIn: '24h'}, (err, token) =>{
+                    if(err){
+                        res.status(400)
+                        res.json({err: "Erro interno"})
+                    }else{
+                        res.status(200)
+                        res.json({token: token})
+                    }
+                })
+               
             }else{
-                res.status(406)
+                res.status(404)
                 res.json({err: "senha invalida"})
             }
         }else{
-            
+            res.status(404)
+            res.json({err: "Email invalido"})
         }
     }
 
