@@ -126,7 +126,7 @@ class UserControler {
         }
     }
 
-    async login(req, res){
+    async login(req, res){// entrando no sistema
         const {email, password} = req.body
 
         const user = await UserModel.findByEmail(email)
