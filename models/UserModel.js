@@ -1,6 +1,6 @@
-let knex = require("../database/connection")
-let bcrypt = require("bcrypt")
-const PasswordTokenModel = require("./PasswordTokenModel")
+let knex = require("../database/connection");
+let bcrypt = require("bcrypt");
+let PasswordTokenModel = require("./PasswordTokenModel");
 
 class User {
     async findAll() { //listado usuarios cadastrados
@@ -27,11 +27,11 @@ class User {
         }
     }
 
-    async findByEmail(email) { //listado usuarios cadastrados pelo id
+    async findByEmail(email) {  //listado usuario cadastrado pelo email
         try {
-            const result = await knex.select(["id_users", "name_users", "password_users", "email_users", "role_users"]).where({ email_users: email }).table("users") //selecionado os campos que consulta retornar
-            if (result.length > 0) {
-                return result[0]
+            const resultado = await knex.select(["id_users", "name_users", "password_users", "email_users", "role_users"]).where({ email_users: email }).table("users") //selecionado os campos que consulta retornar
+            if (resultado.length > 0) {
+                return resultado[0]
             } else {
                 return false
             }
@@ -72,8 +72,6 @@ class User {
 
         if (user) {
             const editUser = {}
-
-
 
             if (name) {// validação
                 editUser.name_users = name

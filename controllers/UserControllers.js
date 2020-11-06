@@ -1,10 +1,21 @@
-const UserModel = require("../models/UserModel")
-const TokenPass = require("../models/PasswordTokenModel")
-const bcrypt = require("bcrypt")
+const UserModel = require("../models/UserModel");
+const TokenPass = require("../models/PasswordTokenModel");
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 
-const jwt =  require("jsonwebtoken")
-
-const secret = "elielMarquesCarvalho"
+const smtpTransport = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    auth: {
+        user: "elielNodeJs@gmail.com",
+        pass: "mamute123"
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+const secret = "elielMarquesCarvalho";
 
 class UserControler {
     async list(req, res) { // listando todos os usuarios
@@ -62,7 +73,7 @@ class UserControler {
         const { id, name, role, email } = req.body
         const result = await UserModel.update(id, name, email, role)
 
-        if(result != undefined){
+        if(result){
             if(result.status){
                 res.status(200)
                 res.json({sucess: "Tudo OK!"})
@@ -91,11 +102,22 @@ class UserControler {
     }
 
     async recoverPass(req, res){ // gerando token para recuperação
-        const email = req.body.email
-        const result = await TokenPass.create(email)
+        let email = req.body.email
+        let idToken = await UserModel.findByEmail(email)
+        let result = await TokenPass.create(idToken.id_users)
         if(result.status){
-            res.status(200)
-            res.json({sucess:result.token})
+           const emailSend = await smtpTransport.sendMail({
+                from: "Eliel Carvalho <elielNodeJs@gmail.com>",
+                to: "elielrty@gmail.com",
+                subject: "Teste de envio de email",
+                text: "Teste de enviou bla bla bla bla",
+                html: "Clique aqui para mudar a senha <a href='google.com'>Aqui</a>"
+            });
+            if(emailSend != undefined){
+                res.status(200)
+                res.json({Sucess: "Email enviado Com sucesso"})
+            }
+            
         }else{
             res.status(406)
             res.json({err: result.err})
