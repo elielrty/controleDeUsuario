@@ -103,8 +103,8 @@ class UserControler {
 
     async recoverPass(req, res){ // gerando token para recuperação
         let email = req.body.email
-        let idToken = await UserModel.findByEmail(email)
-        let result = await TokenPass.create(idToken.id_users)
+        let {id_users} = await UserModel.findByEmail(email)
+        let result = await TokenPass.create(id_users)
         if(result.status){
            const emailSend = await smtpTransport.sendMail({
                 from: "Eliel Carvalho <elielNodeJs@gmail.com>",
@@ -118,6 +118,8 @@ class UserControler {
                 res.json({Sucess: "Email enviado Com sucesso"})
             }
             
+           res.status(200)
+           res.json({Sucess: "Email enviado Com sucesso"})
         }else{
             res.status(406)
             res.json({err: result.err})

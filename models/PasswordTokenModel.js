@@ -1,10 +1,10 @@
 const knex = require("../database/connection");
 
 class PasswordToken { // gerando token e salvando no banco de dados
-    async create(id) {  
-        try {       
+    async create(id) {
+        try {
             if (id != undefined) {
-                console.log("aaaa")
+                await this.tokenDeleteByIdUser(id);
                 const token = Date.now();
                 await knex.insert({
                     id_user: id,
@@ -14,7 +14,7 @@ class PasswordToken { // gerando token e salvando no banco de dados
                 return { status: true, token: token };
 
             } else {
-                return { status: false, err: "O e-mail passado não existe no banco de dados" };
+                return { status: false };
             }
         } catch (err) {
             console.log(err);
@@ -53,30 +53,19 @@ class PasswordToken { // gerando token e salvando no banco de dados
         }
     }
 
-    async deleteToken(user){
-        try{
-            
-        }catch(err){
 
-        }
-    }
-
-    async tokenByIdUser(idUser){
-        try{
-            const result = await knex.select(["id_user", "used"]).where({ id_user: idUser.id_users }).table("user_token") //selecionado os campos que consulta retornar
+    async tokenDeleteByIdUser(idUser) {
+        try {
+            const result = await knex.select(["used"]).where({ id_user: idUser }).table("user_token") //selecionado os campos que consulta retornar
             if (result.length > 0) {
-                if(result.used == 1 || result.id_user){
-                    await knex.delete().where({id_user: result.id_user}).table("user_token")
-                    return true
-                }else{
-                    return false
-                }
+                await knex.delete().where({ id_user: idUser }).table("user_token")
+                return 
             } else {
-                    return false
+                return 
             }
-        }catch(err){
+        } catch (err) {
             console.log(err)
-            return false
+            return 
         }
     }
 
