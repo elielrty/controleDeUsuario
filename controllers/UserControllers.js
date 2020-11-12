@@ -4,12 +4,14 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 
+const Config = require("../config/Smtp")
+
 const smtpTransport = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
+    host: Config.host,
+    port: Config.port,
     auth: {
-        user: "elielNodeJs@gmail.com",
-        pass: "mamute123"
+        user: Config.user,
+        pass: Config.pass
     },
     tls: {
         rejectUnauthorized: false
